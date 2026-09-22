@@ -1,5 +1,5 @@
 // pricing.js
-// Fetches live data from Google Sheets public CSV export and renders grouped HTML accordions
+// Fetches live data from Google Sheets public CSV export and renders a sleek, premium list
 
 const SHEET_ID = '1wckSyLTZinbpNALntkBX_qYVVdd0e6UApgQu9zHhYYs';
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=173898044`;
@@ -15,7 +15,7 @@ async function fetchPricingData() {
         const csvText = await response.text();
         
         const data = parseCSV(csvText);
-        renderTable(data);
+        renderPremiumList(data);
     } catch (error) {
         console.error("Error fetching pricing data:", error);
         document.getElementById("pricing-loader").innerHTML = `
@@ -68,7 +68,7 @@ function parseCSV(text) {
     return result;
 }
 
-function renderTable(data) {
+function renderPremiumList(data) {
     if (!data || data.length < 2) return;
     
     let headerIndex = 0;
@@ -80,7 +80,7 @@ function renderTable(data) {
         }
     }
     
-    const headers = data[headerIndex];
+    const headers = data[headerIndex].map(h => h.toLowerCase().trim());
     let rows = data.slice(headerIndex + 1);
     
     let summaryRow = null;
@@ -97,72 +97,87 @@ function renderTable(data) {
     const contentDiv = document.getElementById("pricing-content");
     contentDiv.innerHTML = ""; // Clear loader and any old content
     
-    // Find Area column
-    const areaIndex = headers.findIndex(h => h.toLowerCase() === "area");
+    // Find column indices dynamically
+    const areaIndex = headers.findIndex(h => h.includes("area"));
+    const nameIndex = headers.findIndex(h => h.includes("component name"));
+    const descIndex = headers.findIndex(h => h.includes("description"));
+    const qtyIndex = headers.findIndex(h => h === "qty" || h === "quantity");
     
-    if (areaIndex !== -1) {
+    // For cost, prefer the last column, or the one with "estimated"
+    let costIndex = headers.findIndex(h => h.includes("estimated"));
+    if (costIndex === -1) costIndex = headers.length - 1; // Fallback to last column
+    
+    if (areaIndex !== -1 && nameIndex !== -1) {
         // Group by Area
         const grouped = {};
         rows.forEach(row => {
-            let area = row[areaIndex] || "Other";
+            let area = row[areaIndex] || "Other Components";
+            if (area.toLowerCase() === "other") area = "Other Components";
+            
+            // Skip empty rows that somehow snuck in
+            if (!row[nameIndex]) return; 
+
             if (!grouped[area]) grouped[area] = [];
             grouped[area].push(row);
         });
 
+        let listContainer = document.createElement("div");
+        listContainer.className = "premium-bom-list";
+
         for (const [area, areaRows] of Object.entries(grouped)) {
-            let details = document.createElement("details");
-            details.className = "pricing-accordion";
-            // Open the first one by default
-            if (Object.keys(grouped)[0] === area) details.open = true;
+            // Group container
+            let groupDiv = document.createElement("div");
+            groupDiv.className = "bom-group";
 
-            let summary = document.createElement("summary");
-            summary.innerHTML = `<strong>${area} Components</strong> <span>${areaRows.length} items</span>`;
-            details.appendChild(summary);
-
-            let tableWrapper = document.createElement("div");
-            tableWrapper.className = "table-responsive";
-
-            let table = document.createElement("table");
-            table.className = "pricing-table sub-table";
+            // Group Header
+            let headerDiv = document.createElement("div");
+            headerDiv.className = "bom-group-header";
             
-            let thead = document.createElement("thead");
-            let trHead = document.createElement("tr");
-            headers.forEach((h, i) => {
-                if(h === "" || i === areaIndex) return;
-                let th = document.createElement("th");
-                th.textContent = h;
-                trHead.appendChild(th);
-            });
-            thead.appendChild(trHead);
-            table.appendChild(thead);
+            // Calculate subtotal for this area (best effort parsing of currency strings)
+            // Just display the area name for now to avoid parsing complex currency symbols safely
+            headerDiv.innerHTML = `<h3>${area}</h3><span class="bom-item-count">${areaRows.length} items</span>`;
+            groupDiv.appendChild(headerDiv);
 
-            let tbody = document.createElement("tbody");
+            // Group Items
+            let itemsDiv = document.createElement("div");
+            itemsDiv.className = "bom-items";
+
             areaRows.forEach(row => {
-                let tr = document.createElement("tr");
-                for(let i=0; i < headers.length; i++) {
-                    if(headers[i] === "" || i === areaIndex) continue; 
-                    
-                    let td = document.createElement("td");
-                    td.textContent = row[i] || "";
-                    
-                    if (row[i] && row[i].match(/[₹$€£]|INR/)) {
-                        td.style.fontWeight = "600";
-                        td.style.color = "#20262c";
-                        td.style.textAlign = "right";
-                    }
-                    if (i === 0) { 
-                         td.style.color = "var(--text-muted)";
-                         td.style.fontWeight = "500";
-                    }
-                    tr.appendChild(td);
-                }
-                tbody.appendChild(tr);
+                let name = row[nameIndex] || "";
+                let desc = descIndex !== -1 ? (row[descIndex] || "") : "";
+                let qty = qtyIndex !== -1 ? (row[qtyIndex] || "1") : "1";
+                let cost = row[costIndex] || "";
+
+                let itemDiv = document.createElement("div");
+                itemDiv.className = "bom-item";
+
+                let infoDiv = document.createElement("div");
+                infoDiv.className = "bom-item-info";
+                
+                let titleSpan = document.createElement("div");
+                titleSpan.className = "bom-item-title";
+                titleSpan.innerHTML = `<span>${name}</span> <span class="bom-item-qty">x${qty}</span>`;
+                
+                let descSpan = document.createElement("div");
+                descSpan.className = "bom-item-desc";
+                descSpan.textContent = desc;
+
+                infoDiv.appendChild(titleSpan);
+                if (desc) infoDiv.appendChild(descSpan);
+
+                let priceDiv = document.createElement("div");
+                priceDiv.className = "bom-item-price";
+                priceDiv.textContent = cost;
+
+                itemDiv.appendChild(infoDiv);
+                itemDiv.appendChild(priceDiv);
+                itemsDiv.appendChild(itemDiv);
             });
-            table.appendChild(tbody);
-            tableWrapper.appendChild(table);
-            details.appendChild(tableWrapper);
-            contentDiv.appendChild(details);
+
+            groupDiv.appendChild(itemsDiv);
+            listContainer.appendChild(groupDiv);
         }
+        contentDiv.appendChild(listContainer);
     }
 
     // Total Cost Card
