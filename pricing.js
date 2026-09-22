@@ -1,8 +1,7 @@
 // pricing.js
-// Fetches live data from Google Sheets public CSV export and renders an HTML table
+// Fetches live data from Google Sheets public CSV export and renders grouped HTML accordions
 
-const SHEET_ID = '1wckSyLTZinbpNALntkBX_qYVVdd0e6UApgQu9zHhYYs'; // Extracted from user's screenshot
-// We use the gid for the specific sheet tab (Sheet1 usually gid=0, but URL says gid=173898044)
+const SHEET_ID = '1wckSyLTZinbpNALntkBX_qYVVdd0e6UApgQu9zHhYYs';
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=173898044`;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -28,7 +27,6 @@ async function fetchPricingData() {
     }
 }
 
-// Simple CSV parser handling quotes for comma-containing fields like "$5,000.00"
 function parseCSV(text) {
     let result = [];
     let row = [];
@@ -42,7 +40,7 @@ function parseCSV(text) {
         if (char === '"') {
             if (inQuotes && nextChar === '"') {
                 val += '"';
-                i++; // skip escaped quote
+                i++;
             } else {
                 inQuotes = !inQuotes;
             }
@@ -50,9 +48,9 @@ function parseCSV(text) {
             row.push(val.trim());
             val = "";
         } else if ((char === '\n' || char === '\r') && !inQuotes) {
-            if (char === '\r' && nextChar === '\n') i++; // handle \r\n
+            if (char === '\r' && nextChar === '\n') i++;
             row.push(val.trim());
-            if (row.join("").trim() !== "") { // Skip completely empty rows
+            if (row.join("").trim() !== "") {
                 result.push(row);
             }
             row = [];
@@ -62,7 +60,6 @@ function parseCSV(text) {
         }
     }
     
-    // push last token
     if (val !== "" || row.length > 0) {
         row.push(val.trim());
         result.push(row);
@@ -74,13 +71,10 @@ function parseCSV(text) {
 function renderTable(data) {
     if (!data || data.length < 2) return;
     
-    // Find where the actual table headers begin
-    // Sometimes Google Sheets has empty title rows at the top. 
-    // We look for a row that has at least 3 columns to assume it's the header.
     let headerIndex = 0;
     for (let i = 0; i < data.length; i++) {
         const rowData = data[i].filter(cell => cell.trim() !== "");
-        if (rowData.length >= 4) { // E.g. "Sr no", "Area", "Component Name"...
+        if (rowData.length >= 4) {
             headerIndex = i;
             break;
         }
@@ -89,7 +83,6 @@ function renderTable(data) {
     const headers = data[headerIndex];
     let rows = data.slice(headerIndex + 1);
     
-    // Extract a summary row if it exists (e.g. "Total Cost:")
     let summaryRow = null;
     rows = rows.filter(row => {
         const text = row.join(" ").toLowerCase();
@@ -97,76 +90,89 @@ function renderTable(data) {
             summaryRow = row;
             return false;
         }
-        // Filter out completely empty rows
         if (row.join("").trim() === "") return false;
         return true;
     });
 
-    const thead = document.getElementById("pricing-thead");
-    const tbody = document.getElementById("pricing-tbody");
-    const tfoot = document.getElementById("pricing-tfoot");
+    const contentDiv = document.getElementById("pricing-content");
+    contentDiv.innerHTML = ""; // Clear loader and any old content
     
-    // Render Header
-    let trHead = document.createElement("tr");
-    headers.forEach(h => {
-        if(h === "") return; // Skip empty columns
-        let th = document.createElement("th");
-        th.textContent = h;
-        trHead.appendChild(th);
-    });
-    thead.appendChild(trHead);
+    // Find Area column
+    const areaIndex = headers.findIndex(h => h.toLowerCase() === "area");
     
-    // Render Body Rows
-    rows.forEach(row => {
-        let tr = document.createElement("tr");
-        
-        let cellsAdded = 0;
-        for(let i=0; i < headers.length; i++) {
-            if(headers[i] === "") continue; 
+    if (areaIndex !== -1) {
+        // Group by Area
+        const grouped = {};
+        rows.forEach(row => {
+            let area = row[areaIndex] || "Other";
+            if (!grouped[area]) grouped[area] = [];
+            grouped[area].push(row);
+        });
+
+        for (const [area, areaRows] of Object.entries(grouped)) {
+            let details = document.createElement("details");
+            details.className = "pricing-accordion";
+            // Open the first one by default
+            if (Object.keys(grouped)[0] === area) details.open = true;
+
+            let summary = document.createElement("summary");
+            summary.innerHTML = `<strong>${area} Components</strong> <span>${areaRows.length} items</span>`;
+            details.appendChild(summary);
+
+            let tableWrapper = document.createElement("div");
+            tableWrapper.className = "table-responsive";
+
+            let table = document.createElement("table");
+            table.className = "pricing-table sub-table";
             
-            let td = document.createElement("td");
-            td.textContent = row[i] || "";
-            
-            // Format numbers nicely if they look like currency
-            if (row[i] && row[i].match(/[₹$€£]|INR/)) {
-                td.style.fontWeight = "600";
-                td.style.color = "#20262c";
-                td.style.textAlign = "right";
-            }
-            if (i === 0) { // Sr No column
-                 td.style.color = "var(--text-muted)";
-                 td.style.fontWeight = "500";
-            }
-            
-            tr.appendChild(td);
-            cellsAdded++;
+            let thead = document.createElement("thead");
+            let trHead = document.createElement("tr");
+            headers.forEach((h, i) => {
+                if(h === "" || i === areaIndex) return;
+                let th = document.createElement("th");
+                th.textContent = h;
+                trHead.appendChild(th);
+            });
+            thead.appendChild(trHead);
+            table.appendChild(thead);
+
+            let tbody = document.createElement("tbody");
+            areaRows.forEach(row => {
+                let tr = document.createElement("tr");
+                for(let i=0; i < headers.length; i++) {
+                    if(headers[i] === "" || i === areaIndex) continue; 
+                    
+                    let td = document.createElement("td");
+                    td.textContent = row[i] || "";
+                    
+                    if (row[i] && row[i].match(/[₹$€£]|INR/)) {
+                        td.style.fontWeight = "600";
+                        td.style.color = "#20262c";
+                        td.style.textAlign = "right";
+                    }
+                    if (i === 0) { 
+                         td.style.color = "var(--text-muted)";
+                         td.style.fontWeight = "500";
+                    }
+                    tr.appendChild(td);
+                }
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+            tableWrapper.appendChild(table);
+            details.appendChild(tableWrapper);
+            contentDiv.appendChild(details);
         }
-        tbody.appendChild(tr);
-    });
-    
-    // Render Footer (Total)
-    if (summaryRow) {
-        let trFoot = document.createElement("tr");
-        let th = document.createElement("th");
-        
-        // Find the index of the cost column to align the total
-        const validHeadersCount = headers.filter(h => h !== "").length;
-        
-        th.colSpan = validHeadersCount - 1; // Span across all but the last column
-        th.style.textAlign = "right";
-        th.textContent = "Total Estimated Cost:";
-        
-        let tdTotal = document.createElement("th"); // use th for bolding
-        tdTotal.textContent = summaryRow[summaryRow.length - 1] || summaryRow.find(val => val.match(/[₹$€£]|INR/));
-        tdTotal.className = "total-cost-highlight";
-        tdTotal.style.textAlign = "right";
-        
-        trFoot.appendChild(th);
-        trFoot.appendChild(tdTotal);
-        tfoot.appendChild(trFoot);
     }
 
-    // Hide loader, show table
+    // Total Cost Card
+    if (summaryRow) {
+        let totalDiv = document.createElement("div");
+        totalDiv.className = "pricing-total-card";
+        let totalVal = summaryRow[summaryRow.length - 1] || summaryRow.find(val => val.match(/[₹$€£]|INR/));
+        totalDiv.innerHTML = `<span>Total Estimated Cost</span> <strong>${totalVal}</strong>`;
+        contentDiv.appendChild(totalDiv);
+    }
+
     document.getElementById("pricing-loader").style.display = "none";
-    document.getElementById("pricing-table").style.display = "table";
 }

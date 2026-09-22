@@ -885,3 +885,70 @@ html {
     color: #218c40 !important;
     font-size: 18px !important;
 }
+
+/* --- PRICING ACCORDIONS --- */
+.pricing-accordion {
+    margin-bottom: 12px;
+    background: #fcfcfc;
+    border: 1px solid #eef1f5;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+.pricing-accordion[open] {
+    background: #ffffff;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    border-color: #d1d5db;
+}
+.pricing-accordion summary {
+    padding: 16px 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+    color: var(--text-main);
+    list-style: none; /* Hide default triangle */
+}
+.pricing-accordion summary::-webkit-details-marker {
+    display: none;
+}
+.pricing-accordion summary::before {
+    content: "▶";
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-right: 12px;
+    transition: transform 0.2s ease;
+}
+.pricing-accordion[open] summary::before {
+    transform: rotate(90deg);
+}
+.pricing-accordion summary span {
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+}
+.sub-table {
+    border-top: 1px solid #eef1f5;
+}
+
+/* --- PRICING TOTAL CARD --- */
+.pricing-total-card {
+    margin-top: 24px;
+    padding: 24px;
+    background: #f4fdf8;
+    border: 1px solid #c2ebd1;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.pricing-total-card span {
+    font-size: 16px;
+    color: #218c40;
+    font-weight: 500;
+}
+.pricing-total-card strong {
+    font-size: 24px;
+    color: #1a6f33;
+}
