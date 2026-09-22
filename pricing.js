@@ -1,5 +1,5 @@
 // pricing.js
-// Fetches live data from Google Sheets public CSV export and renders a sleek, premium list
+// Fetches live data from Google Sheets and renders a side-by-side grid of vertical placeholders
 
 const SHEET_ID = '1wckSyLTZinbpNALntkBX_qYVVdd0e6UApgQu9zHhYYs';
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=173898044`;
@@ -15,7 +15,7 @@ async function fetchPricingData() {
         const csvText = await response.text();
         
         const data = parseCSV(csvText);
-        renderPremiumList(data);
+        renderVerticalGrid(data);
     } catch (error) {
         console.error("Error fetching pricing data:", error);
         document.getElementById("pricing-loader").innerHTML = `
@@ -68,7 +68,17 @@ function parseCSV(text) {
     return result;
 }
 
-function renderPremiumList(data) {
+function parseCurrency(str) {
+    let num = parseFloat(str.replace(/[^0-9.-]+/g,""));
+    return isNaN(num) ? 0 : num;
+}
+
+function getCurrencySymbol(str) {
+    let match = str.match(/[₹$€£]/);
+    return match ? match[0] : '';
+}
+
+function renderVerticalGrid(data) {
     if (!data || data.length < 2) return;
     
     let headerIndex = 0;
@@ -95,92 +105,84 @@ function renderPremiumList(data) {
     });
 
     const contentDiv = document.getElementById("pricing-content");
-    contentDiv.innerHTML = ""; // Clear loader and any old content
+    contentDiv.innerHTML = ""; 
     
-    // Find column indices dynamically
     const areaIndex = headers.findIndex(h => h.includes("area"));
     const nameIndex = headers.findIndex(h => h.includes("component name"));
     const descIndex = headers.findIndex(h => h.includes("description"));
     const qtyIndex = headers.findIndex(h => h === "qty" || h === "quantity");
-    
-    // For cost, prefer the last column, or the one with "estimated"
     let costIndex = headers.findIndex(h => h.includes("estimated"));
-    if (costIndex === -1) costIndex = headers.length - 1; // Fallback to last column
+    if (costIndex === -1) costIndex = headers.length - 1; 
     
     if (areaIndex !== -1 && nameIndex !== -1) {
-        // Group by Area
         const grouped = {};
+        let currencySymbol = '$'; // default
+
         rows.forEach(row => {
-            let area = row[areaIndex] || "Other Components";
-            if (area.toLowerCase() === "other") area = "Other Components";
-            
-            // Skip empty rows that somehow snuck in
+            let area = row[areaIndex] || "Other";
+            if (area.toLowerCase() === "other") area = "Other";
             if (!row[nameIndex]) return; 
 
             if (!grouped[area]) grouped[area] = [];
             grouped[area].push(row);
+
+            let costStr = row[costIndex] || "";
+            let sym = getCurrencySymbol(costStr);
+            if(sym) currencySymbol = sym;
         });
 
-        let listContainer = document.createElement("div");
-        listContainer.className = "premium-bom-list";
+        let gridContainer = document.createElement("div");
+        gridContainer.className = "pricing-vertical-grid";
 
         for (const [area, areaRows] of Object.entries(grouped)) {
-            // Group container
-            let groupDiv = document.createElement("div");
-            groupDiv.className = "bom-group";
+            let columnDiv = document.createElement("div");
+            columnDiv.className = "pricing-column";
 
-            // Group Header
+            // Calculate subtotal
+            let subtotal = 0;
+            areaRows.forEach(row => {
+                subtotal += parseCurrency(row[costIndex] || "0");
+            });
+            // Format subtotal
+            let subtotalStr = currencySymbol + subtotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
             let headerDiv = document.createElement("div");
-            headerDiv.className = "bom-group-header";
-            
-            // Calculate subtotal for this area (best effort parsing of currency strings)
-            // Just display the area name for now to avoid parsing complex currency symbols safely
-            headerDiv.innerHTML = `<h3>${area}</h3><span class="bom-item-count">${areaRows.length} items</span>`;
-            groupDiv.appendChild(headerDiv);
+            headerDiv.className = "column-header";
+            headerDiv.innerHTML = `<h3>${area}</h3><div class="column-subtotal">${subtotalStr}</div>`;
+            columnDiv.appendChild(headerDiv);
 
-            // Group Items
+            // Dropdown wrapper
+            let details = document.createElement("details");
+            details.className = "column-details";
+            
+            let summary = document.createElement("summary");
+            summary.innerHTML = `<span>View ${areaRows.length} Items</span>`;
+            details.appendChild(summary);
+
             let itemsDiv = document.createElement("div");
-            itemsDiv.className = "bom-items";
+            itemsDiv.className = "column-items";
 
             areaRows.forEach(row => {
                 let name = row[nameIndex] || "";
-                let desc = descIndex !== -1 ? (row[descIndex] || "") : "";
                 let qty = qtyIndex !== -1 ? (row[qtyIndex] || "1") : "1";
                 let cost = row[costIndex] || "";
 
                 let itemDiv = document.createElement("div");
-                itemDiv.className = "bom-item";
-
-                let infoDiv = document.createElement("div");
-                infoDiv.className = "bom-item-info";
-                
-                let titleSpan = document.createElement("div");
-                titleSpan.className = "bom-item-title";
-                titleSpan.innerHTML = `<span>${name}</span> <span class="bom-item-qty">x${qty}</span>`;
-                
-                let descSpan = document.createElement("div");
-                descSpan.className = "bom-item-desc";
-                descSpan.textContent = desc;
-
-                infoDiv.appendChild(titleSpan);
-                if (desc) infoDiv.appendChild(descSpan);
-
-                let priceDiv = document.createElement("div");
-                priceDiv.className = "bom-item-price";
-                priceDiv.textContent = cost;
-
-                itemDiv.appendChild(infoDiv);
-                itemDiv.appendChild(priceDiv);
+                itemDiv.className = "column-item";
+                itemDiv.innerHTML = `
+                    <div class="col-item-name">${name} <span class="col-item-qty">x${qty}</span></div>
+                    <div class="col-item-price">${cost}</div>
+                `;
                 itemsDiv.appendChild(itemDiv);
             });
 
-            groupDiv.appendChild(itemsDiv);
-            listContainer.appendChild(groupDiv);
+            details.appendChild(itemsDiv);
+            columnDiv.appendChild(details);
+            gridContainer.appendChild(columnDiv);
         }
-        contentDiv.appendChild(listContainer);
+        contentDiv.appendChild(gridContainer);
     }
 
-    // Total Cost Card
     if (summaryRow) {
         let totalDiv = document.createElement("div");
         totalDiv.className = "pricing-total-card";
