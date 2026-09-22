@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autonomous Robotic Dosa Workcell</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="architecture.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Minimal Header -->
+    <header class="app-header">
+        <div class="logo-area" style="flex: 1; display: flex; justify-content: flex-start;">
+            <img src="images/logo.png" alt="DosaBot Logo" style="height: 40px;" onerror="this.style.display='none'">
+        </div>
+        
+        <nav class="quick-nav" style="flex: 1; display: flex; justify-content: center;">
+            <a href="#overview">Dosa Station</a>
+            <a href="#architecture-link">Architecture</a>
+            <a href="#components">Components</a>
+        </nav>
+
+        <div class="brand-area" style="flex: 1; display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem;">
+            <h1 style="font-size: 1rem; font-weight: 700; color: #1d1d1f; letter-spacing: -0.01em; margin: 0;">DosaBot X1</h1>
+            <span class="version-tag" style="font-size: 0.65rem; padding: 0.15rem 0.4rem; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted);">Rev 2.4 - Alpha</span>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-overlay"></div>
+    </section>
+
+    <main>
+        <!-- 2. The Dosa Station Layout -->
+        <section id="overview" class="section">
+            <h2>The Dosa Station</h2>
+            <div class="overview-diagram-wrapper">
+                <img src="images/workcell_diagram.png" alt="Autonomous Robotic Dosa Workcell Diagram" class="overview-diagram" onerror="this.src='https://placehold.co/1200x800/e9ecef/495057?text=workcell_diagram.png'">
+            </div>
+        </section>
+
+        <!-- Architecture Simulator Embedded -->
+        <section id="architecture-link" class="app section">
+
+
+        <header class="simulator-header" style="text-align: center; margin-bottom: 20px; width: 100%; display: flex; justify-content: center; position: relative; z-index: 10;">
+            <h2 style="font-size: 2rem; margin-bottom: 5px; letter-spacing: -0.04em; margin: 0 auto;">Architecture overview flow</h2>
+            
+        </header>
+
+        <section class="architecture" id="architecture" style="display: block; width: 100%; padding: 0;">
+            <div id="dosa-tutorial-container">
+<div class="backdrop"></div><main>
+<header><div class="tools"><button class="button" disabled="" id="pause">Pause</button><button class="button" id="reset">Start over</button></div></header>
+<div class="layout"><aside><section class="panel"><div class="menu"><button class="recipe" data-recipe="plain"><span class="food"></span><span><strong>Plain Dosa</strong><small>Batter · oil</small></span><b>↗</b></button><button class="recipe" data-recipe="ghee"><span class="food"></span><span><strong>Ghee Roast</strong><small>Batter · ghee</small></span><b>↗</b></button><button class="recipe" data-recipe="podi"><span class="food"></span><span><strong>Podi Dosa</strong><small>Batter · oil · podi</small></span><b>↗</b></button></div><div class="ingredients" id="ingredients"><span class="chip">Batter</span><span class="chip">Oil</span><span class="chip">Ghee</span><span class="chip">Podi</span></div><ol class="steps" id="steps"></ol></section><details class="reference" open><summary>View the machine design reference</summary><img alt="Original enclosed dosa vending machine with central robot and circular conveyor" id="reference" src="images/tutorial_bg.png"/></details></aside>
+<section><div class="stage-shell"><div class="stage-top"><div><h3 id="orderName" style="margin:5px 0 0;font-size:15px">Waiting for your first order</h3></div><div class="status" id="status"><i></i><span>Ready</span></div></div><div class="stage">
+<svg aria-labelledby="sceneTitle sceneDesc" id="scene" role="img" viewBox="0 0 800 740"><title id="sceneTitle">Autonomous dosa machine</title><desc id="sceneDesc">A central robotic arm reaches a cooking pad inside a circular conveyor. Overhead ingredient nozzles prepare each selected recipe. Finished dosas are boxed and delivered to the front pickup.</desc>
+<defs><linearGradient id="steel" x2="1" y2="1"><stop stop-color="#fafcfd"></stop><stop offset=".5" stop-color="#cdd5dd"></stop><stop offset="1" stop-color="#f0f4f7"></stop></linearGradient><linearGradient id="pan" x2="0" y2="1"><stop stop-color="#353c44"></stop><stop offset="1" stop-color="#20262c"></stop></linearGradient><filter height="160%" id="shadow" width="160%" x="-30%" y="-30%"><feDropShadow dx="0" dy="5" flood-opacity=".1" stdDeviation="5"></feDropShadow></filter><pattern height="28" id="floor" patternUnits="userSpaceOnUse" width="28"><circle cx="1" cy="1" fill="#e5e9ef" r=".8"></circle></pattern></defs>
+<rect fill="url(#floor)" height="740" width="800"></rect><rect fill="#fff" filter="url(#shadow)" height="618" rx="44" stroke="#d7dfe7" stroke-width="2" width="668" x="66" y="58"></rect><rect fill="#f1f5f8" height="586" rx="35" stroke="#dfe6ed" width="636" x="82" y="74"></rect>
+<text class="machine-label" x="108" y="106">AUTONOMOUS WORKCELL</text><rect fill="#e1e7ec" height="32" rx="8" width="156" x="521" y="86"></rect><path d="M535 93h125M535 101h125M535 109h125" stroke="#b5c0ca" stroke-width="2"></path><text class="meter-label" x="550" y="136">Extraction canopy</text>
+<circle cx="400" cy="365" fill="none" r="240" stroke="#ccd5de" stroke-width="69"></circle><circle cx="400" cy="365" fill="none" r="240" stroke="#edf1f5" stroke-width="60"></circle><g id="slats"></g><circle cx="400" cy="365" fill="none" r="274" stroke="#aebac6" stroke-width="3"></circle><circle cx="400" cy="365" fill="#e8eef3" r="205" stroke="#b6c2cd" stroke-width="3"></circle>
+<rect fill="#d6e0e9" height="53" rx="9" stroke="#aebdca" width="100" x="350" y="596"></rect><path d="M365 603v38m13-38v38m13-38v38m13-38v38m13-38v38m13-38v38" stroke="#b1becb"></path><rect fill="#fff" height="64" rx="15" stroke="#c2ccd7" stroke-width="2" width="162" x="319" y="640"></rect><text class="machine-label" text-anchor="middle" x="400" y="725">PICKUP WINDOW</text><rect fill="#394551" height="12" id="shutter" rx="5" width="160" x="320" y="641"></rect>
+<g id="packageUnit"><rect fill="url(#steel)" height="112" rx="12" stroke="#a8b5c1" width="88" x="598" y="297"></rect><rect fill="#f5eee3" height="31" rx="5" stroke="#d0b991" width="62" x="611" y="308"></rect><path d="M615 314h54m-54 6h54m-54 6h54" stroke="#d0b991"></path><rect fill="#7c8b99" height="15" rx="5" width="74" x="605" y="350"></rect><text class="meter-label" text-anchor="middle" x="642" y="393">BOX / CLOSE</text></g>
+<circle cx="507" cy="277" fill="#b9c6d1" r="104"></circle><circle cx="507" cy="277" fill="url(#pan)" r="97"></circle><circle cx="507" cy="277" fill="none" id="heatRing" opacity=".12" r="94" stroke="#ff9500" stroke-width="3"></circle><text class="meter-label" id="panLabel" text-anchor="middle" x="507" y="398">Induction cooking pad</text>
+<g id="dosa"><circle cx="507" cy="277" fill="#fff1d5" id="batter" r="0"></circle><g id="rings" opacity="0"></g><g id="speckles" opacity="0"></g><path d="M -76 0 A76 76 0 0 0 76 0 Z" fill="#e4a746" id="folded" stroke="#c88a33" stroke-width="2" transform="translate(507 277)" visibility="hidden"></path><path d="M -76 0 A76 76 0 0 1 76 0 Z" fill="#efd092" id="foldTop" stroke="#d1a357" visibility="hidden"></path></g>
+<g id="gantry"><rect fill="#a9b8c6" height="10" rx="5" width="245" x="391" y="138"></rect><rect fill="#bac6d1" height="47" rx="4" width="10" x="391" y="124"></rect><rect fill="#bac6d1" height="47" rx="4" width="10" x="626" y="124"></rect><g id="head"><rect fill="url(#steel)" height="42" rx="11" stroke="#9daebb" width="164" x="429" y="135"></rect><g id="batterTank"><rect fill="#fff1d5" height="23" rx="5" stroke="#d5c8b0" width="28" x="441" y="144"></rect></g><rect fill="#f8d878" height="23" id="fatTank" rx="5" stroke="#d4b55a" width="28" x="480" y="144"></rect><rect fill="#c88743" height="23" rx="5" stroke="#a66e35" width="28" x="519" y="144"></rect><rect fill="#d8eaf6" height="23" rx="5" stroke="#a9c9de" width="23" x="558" y="144"></rect><path d="M455 177v24m39-24v24m39-24v24m37-24v24" stroke="#899caa" stroke-linecap="round" stroke-width="6"></path></g></g>
+<g id="drops"></g><g id="steam"></g>
+<g id="box" visibility="hidden"><rect fill="#dcc49e" height="54" rx="7" stroke="#b99d72" stroke-width="2" width="74" x="-37" y="-27"></rect><rect fill="#fff9ef" height="42" rx="5" width="60" x="-30" y="-21"></rect><path d="M-26 -9 A26 26 0 0 0 26 -9Z" fill="#e3a34b" id="boxDosa" stroke="#bf8737" visibility="hidden"></path><rect fill="#ead9bb" height="54" id="lid" opacity="0" rx="7" stroke="#b99d72" stroke-width="2" width="74" x="-37" y="-27"></rect><g id="lidMarks" opacity="0" stroke="#b79b72" stroke-width="2"><path d="M-10 -5v10M0 -5v10M10 -5v10"></path></g></g>
+<circle cx="365" cy="395" fill="url(#steel)" r="43" stroke="#9dadbc" stroke-width="2"></circle><circle cx="365" cy="395" fill="#6e7c89" r="28"></circle><g id="arm" stroke-linecap="round" stroke-linejoin="round"><path fill="none" id="armShadow" stroke="#00000015" stroke-width="34" transform="translate(0 6)"></path><path fill="none" id="armEdge" stroke="#8f9fac" stroke-width="30"></path><path fill="none" id="armBody" stroke="#e4eaf0" stroke-width="23"></path><circle fill="url(#steel)" id="elbow" r="17" stroke="#8c9fac" stroke-width="2"></circle><circle fill="#dde5ec" id="wrist" r="12" stroke="#8c9fac" stroke-width="2"></circle><g id="tool"><rect fill="#6a7b88" height="21" rx="4" width="14" x="-7" y="-6"></rect><rect fill="#d3dde5" height="18" rx="5" stroke="#8297a8" width="38" x="-19" y="8"></rect><path d="M-11 14h22m-22 5h22" stroke="#9caeba"></path></g></g><text class="machine-label" x="270" y="477">6-AXIS ARM</text>
+<g id="pauseCover"><rect fill="#ffffffaa" height="740" width="800"></rect><text fill="#1d1d1f" font-size="24" font-weight="650" text-anchor="middle" x="400" y="375">Simulation paused</text></g>
+<g class="tutorial-layer" id="tutorial"><rect fill="#172338" height="740" opacity=".16" width="800"></rect><circle fill="#ffffff20" id="targetRing" r="26" stroke="#007aff" stroke-width="3"></circle><path fill="none" id="leader" stroke="#007aff" stroke-width="2"></path><circle fill="#007aff" id="targetDot" r="4"></circle><g id="callout"><rect fill="#ffffff" fill-opacity=".97" filter="url(#shadow)" height="142" rx="19" stroke="#dce6f0" width="338"></rect><text class="callout-tag" id="tipTag" x="20" y="27"></text><text class="callout-title" id="tipTitle" x="20" y="52"></text><text class="callout-copy" id="tipLine1" x="20" y="77"></text><text class="callout-copy" id="tipLine2" x="20" y="96"></text><rect fill="#eaf0f7" height="3" rx="2" width="298" x="20" y="115"></rect><rect fill="#007aff" height="3" id="tipProgress" rx="2" width="0" x="20" y="115"></rect></g></g>
+</svg></div><div class="progress"><div id="overall"></div></div><div class="stage-bottom"><div aria-live="polite" role="status"><strong id="current">Your kitchen is ready.</strong><p id="detail">Choose a dosa to start the interactive tutorial.</p></div><button class="collect" hidden="" id="collect">Collect dosa</button></div></div></section></div></main>
+
+</div>
+        </section>
+
+        
+
+        
+
+    
+        </section>
+
+        <!-- 3. Components List -->
+        <section id="components" class="section">
+            <h2>Components & Scaling Pricing</h2>
+            <p class="section-subtitle">Interactive Bill of Materials and hardware pricing breakdown.</p>
+            
+            <div class="components-wrapper">
+                <div class="pricing-container" id="pricing-container">
+                    <div class="pricing-loader" id="pricing-loader">
+                        <div class="spinner"></div>
+                        <p>Syncing live pricing data...</p>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="pricing-table" id="pricing-table" style="display: none;">
+                            <thead id="pricing-thead"></thead>
+                            <tbody id="pricing-tbody"></tbody>
+                            <tfoot id="pricing-tfoot"></tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </section>
+    </main>
+    <script src="architecture.js"></script>
+    <script src="script.js"></script>
+    <script src="pricing.js"></script>
+</body>
+</html>

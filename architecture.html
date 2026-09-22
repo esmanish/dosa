@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Architecture Simulator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="architecture.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body style="background: var(--bg-main);">
+    <!-- Minimal Header -->
+    <header class="app-header">
+        <div class="logo-area">
+            <h1>DosaBot X1 Simulator</h1>
+        </div>
+        <nav class="quick-nav">
+            <a href="index.html">&larr; Back to Main Site</a>
+        </nav>
+    </header>
+
+    <body>
+        <main class="app">
+
+            <header class="simulator-header">
+                <div>
+                    <div class="eyebrow">Interactive Architecture</div>
+                    <h1 class="astra-h1">Your order.<br>A coordinated kitchen.</h1>
+                    <p class="astra-p">Follow every order from selection to service.</p>
+                    <div class="manual-indicator">
+                        <i aria-hidden="true"></i>
+                        User-controlled orders · No automatic generation
+                    </div>
+                </div>
+
+                <button class="reset-button" id="reset" type="button">
+                    Reset
+                </button>
+            </header>
+
+            <section class="metrics" aria-label="Kitchen metrics">
+                <div class="metric">
+                    <span>Orders placed</span>
+                    <strong id="placed">0</strong>
+                </div>
+
+                <div class="metric">
+                    <span>Stations active</span>
+                    <strong id="active">0 / 3</strong>
+                </div>
+
+                <div class="metric">
+                    <span>Awaiting station</span>
+                    <strong id="waiting">0</strong>
+                </div>
+
+                <div class="metric">
+                    <span>Meals served</span>
+                    <strong id="served">0</strong>
+                </div>
+            </section>
+
+            <section class="architecture" id="architecture" aria-label="Vertical order flow simulator">
+                <svg id="connections" aria-hidden="true"></svg>
+
+                <!-- ZONE A -->
+                <div class="zone">
+                    <div class="zone-label">
+                        <span class="zone-letter">A</span>
+                        Customer order input
+                    </div>
+
+                    <div class="card" id="customer">
+                        <h2 class="astra-h2">Choose your dosa.</h2>
+                        <p class="subcopy">
+                            Each click places one order. Click again to add more.
+                        </p>
+
+                        <div class="recipes">
+                            <button class="recipe" data-recipe="plain" type="button">
+                                <span class="recipe-icon" aria-hidden="true">
+                                    <span class="dosa-icon"></span>
+                                </span>
+                                <span>
+                                    <strong>Plain / Sada Dosa</strong>
+                                    <small>Batter + Oil</small>
+                                </span>
+                                <span class="plus" aria-hidden="true">+</span>
+                            </button>
+
+                            <button class="recipe" data-recipe="ghee" type="button">
+                                <span class="recipe-icon" aria-hidden="true">
+                                    <span class="dosa-icon"></span>
+                                </span>
+                                <span>
+                                    <strong>Ghee Roast</strong>
+                                    <small>Batter + Ghee</small>
+                                </span>
+                                <span class="plus" aria-hidden="true">+</span>
+                            </button>
+
+                            <button class="recipe" data-recipe="podi" type="button">
+                                <span class="recipe-icon" aria-hidden="true">
+                                    <span class="dosa-icon"></span>
+                                </span>
+                                <span>
+                                    <strong>Podi Dosa</strong>
+                                    <small>Batter + Oil + Podi</small>
+                                </span>
+                                <span class="plus" aria-hidden="true">+</span>
+                            </button>
+                        </div>
+
+                        <div class="notice" id="notice" role="status" aria-live="polite">
+                            Waiting for your first order.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ZONE B -->
+                <div class="zone">
+                    <div class="zone-label">
+                        <span class="zone-letter">B</span>
+                        Central routing engine
+                    </div>
+
+                    <div class="card router-card" id="router">
+                        <div class="router-icon">
+                            <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                                <rect x="11" y="11" width="10" height="10" rx="3" stroke="currentColor"
+                                    stroke-width="2" />
+                                <path d="M16 3v8M16 21v8M3 16h8M21 16h8
+                 M7 7l5 5M20 20l5 5M25 7l-5 5M12 20l-5 5" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </div>
+
+                        <h2 class="astra-h2">Central Router</h2>
+
+                        <p class="routing-copy" id="routing-copy">
+                            Waiting for a customer order.
+                        </p>
+
+                        <span class="badge green" id="router-status">
+                            <span class="dot"></span>
+                            <span>Ready to route</span>
+                        </span>
+
+                        <div class="router-progress"><i></i></div>
+
+                        <div class="queue">
+                            <div class="queue-head">
+                                <span>Waiting queue</span>
+                                <span id="queue-count">0 orders</span>
+                            </div>
+
+                            <div class="queue-list" id="queue-list">
+                                <span class="empty">No orders waiting.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ZONE C -->
+                <div class="zone">
+                    <div class="zone-label">
+                        <span class="zone-letter">C</span>
+                        Robotic stations
+                    </div>
+
+                    <p class="station-description">
+                        Three independent stations. Orders cook concurrently.
+                    </p>
+
+                    <div class="stations" id="stations"></div>
+                </div>
+
+            </section>
+
+            <section class="card activity">
+                <h3 class="astra-h3">Live activity</h3>
+                <div class="log" id="log" aria-label="Recent kitchen events"></div>
+            </section>
+
+            <footer>
+                Orders are created only by your recipe selections.
+                Routing, cooking, and cleaning then proceed automatically.
+                <br>
+                Demo timings: routing 1s · dispensing 1.8s · cooking 5.2s ·
+                plating 1.5s · cleaning 1.7s.
+                These are illustrative, not real cooking specifications.
+            </footer>
+
+        </main>
+
+
+        <script src="architecture.js"></script>
+    </body>
+
+</html>
