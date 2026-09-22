@@ -845,7 +845,7 @@ html {
 .pricing-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: 14px;
     text-align: left;
 }
 
@@ -853,7 +853,7 @@ html {
     background: #fcfcfc;
     color: var(--text-muted);
     font-weight: 600;
-    padding: 14px 16px;
+    padding: 18px 20px;
     border-bottom: 2px solid #eef1f5;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -861,7 +861,7 @@ html {
 }
 
 .pricing-table td {
-    padding: 16px;
+    padding: 24px 20px; line-height: 1.6;
     border-bottom: 1px solid #eef1f5;
     color: var(--text-main);
 }

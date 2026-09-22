@@ -128,7 +128,7 @@ function renderTable(data) {
             td.textContent = row[i] || "";
             
             // Format numbers nicely if they look like currency
-            if (row[i] && row[i].includes("$")) {
+            if (row[i] && row[i].match(/[₹$€£]|INR/)) {
                 td.style.fontWeight = "600";
                 td.style.color = "#20262c";
                 td.style.textAlign = "right";
@@ -157,7 +157,7 @@ function renderTable(data) {
         th.textContent = "Total Estimated Cost:";
         
         let tdTotal = document.createElement("th"); // use th for bolding
-        tdTotal.textContent = summaryRow[summaryRow.length - 1] || summaryRow.find(val => val.includes("$"));
+        tdTotal.textContent = summaryRow[summaryRow.length - 1] || summaryRow.find(val => val.match(/[₹$€£]|INR/));
         tdTotal.className = "total-cost-highlight";
         tdTotal.style.textAlign = "right";
         
